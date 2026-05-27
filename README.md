@@ -13,6 +13,7 @@ This is a lightweight browser automation workflow learning project. It uses Pyth
 ## Project Layout / 目录
 
 - `data/`：输入 URL 列表
+- `examples/`：不含第三方真实网页内容的示例输出
 - `src/`：采集、解析、写出简报的基础模块
 - `screenshots/`：页面截图输出，本地运行后生成
 - `outputs/`：CSV / Markdown 结果输出，本地运行后生成
@@ -39,9 +40,16 @@ python -m playwright install chromium
 python run_workflow.py
 ```
 
+也可以先复制一个输入样例，再按自己的关注对象修改：
+
+```powershell
+Copy-Item data\match_urls.example.csv data\match_urls.csv
+```
+
 ## Input Format / 输入格式
 
-运行前需要先编辑 [data/match_urls.csv](D:/github/football-matchday-briefing-workflow/data/match_urls.csv)。
+运行前需要先编辑 `data/match_urls.csv`。
+如果你是第一次使用，也可以先参考 `data/match_urls.example.csv`。
 
 CSV 格式:
 
@@ -60,6 +68,34 @@ Premier League,fixtures,https://www.premierleague.com/fixtures
 
 这个文件只适合放手动挑选的公开页面，不适合做高频批量抓取列表。
 
+## CLI Usage / 命令行参数
+
+基础运行:
+
+```bash
+python run_workflow.py
+```
+
+指定输入、输出目录和处理条数:
+
+```bash
+python run_workflow.py --input data/match_urls.csv --output-dir outputs --screenshot-dir screenshots --limit 2
+```
+
+如果你想看到浏览器窗口，可以加 `--headful`:
+
+```bash
+python run_workflow.py --headful
+```
+
+参数说明:
+
+- `--input`：输入 CSV 路径，默认 `data/match_urls.csv`
+- `--output-dir`：CSV 和 Markdown 输出目录，默认 `outputs`
+- `--screenshot-dir`：截图目录，默认 `screenshots`
+- `--limit`：只处理前 N 条输入，适合先做小范围检查
+- `--headful`：以可见模式启动 Chromium；默认仍是 headless
+
 ## Output Files / 输出文件
 
 运行 `python run_workflow.py` 后，会在本地生成：
@@ -69,6 +105,13 @@ Premier League,fixtures,https://www.premierleague.com/fixtures
 - `screenshots/*.png`
 
 这些运行产物默认不提交到 GitHub，因为其中可能包含第三方网页正文片段和截图。仓库默认只保留 workflow 代码、配置和输入样例。
+
+仓库中另外提供了两个纯示例文件，方便陌生用户先理解输出结构，而不用先运行真实网页抓取：
+
+- `examples/sample_collected_pages.csv`
+- `examples/sample_matchday_briefing.md`
+
+这些示例内容是虚构的，不包含第三方真实网页正文或截图。
 
 ## Status Meaning / 状态说明
 
@@ -81,6 +124,13 @@ Premier League,fixtures,https://www.premierleague.com/fixtures
 ## Example Use Case / 示例用法
 
 一个常见用法是：把自己关注的球队官网新闻页、联赛赛程页、比赛前瞻页整理到 `match_urls.csv`，然后运行脚本，在本地生成一份简单的 matchday briefing。它不是新闻聚合平台，也不是大型 AI 系统，更像一个 lightweight browser automation workflow，帮助你把手动选好的公开网页整理成结构化输出。
+
+## Project Scope / 项目边界
+
+- 只处理手动提供的公开 URL
+- 不做登录，不绕过验证码，不处理付费或受限内容
+- 不承诺所有网站都能成功访问或稳定返回正文
+- 更适合作为个人使用或学习用途的 lightweight browser automation workflow
 
 ## Troubleshooting / 常见问题
 

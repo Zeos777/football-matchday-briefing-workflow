@@ -29,7 +29,13 @@ def _looks_blocked(page_title: str, body_text: str) -> bool:
     return any(marker in combined_text for marker in BLOCKED_MARKERS)
 
 
-def collect_page(url: str, team: str, source_type: str, screenshot_dir: str | Path) -> dict:
+def collect_page(
+    url: str,
+    team: str,
+    source_type: str,
+    screenshot_dir: str | Path,
+    headless: bool = True,
+) -> dict:
     """Visit one public page, collect a small text excerpt, and save a screenshot."""
     screenshot_directory = ensure_dir(screenshot_dir)
     filename_base = safe_filename(f"{team}-{source_type}")
@@ -50,7 +56,7 @@ def collect_page(url: str, team: str, source_type: str, screenshot_dir: str | Pa
         from playwright.sync_api import sync_playwright
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(headless=headless)
             page = browser.new_page()
 
             try:

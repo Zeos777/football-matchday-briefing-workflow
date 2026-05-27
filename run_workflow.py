@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -13,12 +14,48 @@ from src.report_writer import write_csv, write_markdown_briefing
 from src.utils import ensure_dir
 
 
+def build_parser() -> argparse.ArgumentParser:
+    """Create the command-line interface for the workflow."""
+    parser = argparse.ArgumentParser(
+        description="Collect public football pages and build a local matchday briefing."
+    )
+    parser.add_argument(
+        "--input",
+        default="data/match_urls.csv",
+        help="Path to the input CSV file. Default: data/match_urls.csv",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default="outputs",
+        help="Directory for collected_pages.csv and matchday_briefing.md",
+    )
+    parser.add_argument(
+        "--screenshot-dir",
+        default="screenshots",
+        help="Directory for page screenshots",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Optional limit for how many rows to process",
+    )
+    parser.add_argument(
+        "--headful",
+        action="store_true",
+        help="Run Chromium in visible mode instead of headless mode",
+    )
+    return parser
+
+
 def main() -> None:
     """Run the end-to-end workflow."""
+    parser = build_parser()
+    args = parser.parse_args()
     project_root = Path(__file__).resolve().parent
-    input_csv = project_root / "data" / "match_urls.csv"
-    screenshots_dir = ensure_dir(project_root / "screenshots")
-    outputs_dir = ensure_dir(project_root / "outputs")
+    input_csv = (project_root / args.input).resolve()
+    screenshots_dir = ensure_dir(project_root / args.screenshot_dir)
+    outputs_dir = ensure_dir(project_root / args.output_dir)
     csv_output_path = outputs_dir / "collected_pages.csv"
     markdown_output_path = outputs_dir / "matchday_briefing.md"
 
@@ -34,6 +71,9 @@ def main() -> None:
         print(f"Missing required columns in {input_csv}: {missing}")
         sys.exit(1)
 
+    if args.limit is not None:
+        dataframe = dataframe.head(args.limit)
+
     results: list[dict] = []
 
     for row in dataframe.fillna("").to_dict(orient="records"):
@@ -42,6 +82,7 @@ def main() -> None:
             team=str(row["team"]).strip(),
             source_type=str(row["source_type"]).strip(),
             screenshot_dir=screenshots_dir,
+            headless=not args.headful,
         )
         parsed_result = parse_collected_page(raw_result)
         results.append(parsed_result)
@@ -60,6 +101,7 @@ def main() -> None:
     print(f"Failed count: {failed_count}")
     print(f"CSV output: {csv_output_path}")
     print(f"Markdown output: {markdown_output_path}")
+    print(f"Screenshot directory: {screenshots_dir}")
 
 
 if __name__ == "__main__":

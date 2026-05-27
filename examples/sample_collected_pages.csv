@@ -1,0 +1,4 @@
+team,source_type,url,page_title,text_excerpt,screenshot_path,status,error,simple_keywords
+Northbridge FC,official_news,https://example.test/northbridge/news,Northbridge FC training update,"Northbridge FC completed a light recovery session before the weekend fixture. The coaching staff expect a full squad update on Friday afternoon.",examples/screenshots/northbridge-official-news.png,success,,fixture
+Northbridge FC,preview,https://example.test/northbridge/preview,Weekend preview,"Northbridge FC will travel for a league match on Saturday. The preview mentions a likely lineup change and one late fitness check.",examples/screenshots/northbridge-preview.png,success,,"match, preview, lineup, league"
+Metro League,fixtures,https://example.test/metro-league/fixtures,Access Denied,"Access Denied. This example row shows how a restricted page may be recorded in the output.",examples/screenshots/metro-league-fixtures.png,blocked,Page appears to be blocked or access-restricted.,
